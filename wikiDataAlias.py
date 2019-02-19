@@ -14,16 +14,19 @@ with open('diseaseOrganize.csv', 'w') as csv_file:
     # looping through every item returned from gard rare diseases
     for item in data:
         # gard id for this disease
-        gardId = item['diseaseId']
+        gardId = str(item['diseaseId'])
         synonyms = item['synonyms']
         # list of synonyms that this item has
         identifiers = item['identifiers']
+        identifiers_str = ''
         # list of identifiers that this item has (including 3 types: OMIM, UMLS, and ORPANET)
+
         set_of_results = set()
 
         # for each identifier send a query to wikidata
         # And add the resulting items list to set of results
         for idf in identifiers:
+            identifiers_str = identifiers_str + idf['identifierType'] + ':' + idf['identifierId'] + ' | '
             predicate = ''
             if idf['identifierType'] == 'OMIM':
                 predicate = 'P492'
@@ -51,6 +54,13 @@ with open('diseaseOrganize.csv', 'w') as csv_file:
             for uri in result['results']['bindings']:
                 set_of_results.add(uri['item']['value'])
 
+        num_of_matches = str(len(set_of_results))
+        QIDs = ''
+        while len(set_of_results) != 0:
+            q_number = set_of_results.pop()[31:]
+            QIDs = QIDs + str(q_number) + ' | '
+        writer.writerow({'Gard ID': gardId, 'identifiers': identifiers_str, 'Number of Matches': num_of_matches,
+                         'QID': QIDs})
         #if len(set_of_results) == 0:
             # This rare disease didn't find any match for any identifier
             # or it doesn't have any identifier
