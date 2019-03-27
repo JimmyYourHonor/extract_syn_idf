@@ -1,5 +1,6 @@
 from wikidataintegrator import wdi_core, wdi_login
 from time import gmtime, strftime
+import yaml
 
 # list of items on wikidata that we are going to modify
 Qid_and_gardId_pairs = {
@@ -15,8 +16,11 @@ stated_in = 'P248'
 
 retrieved = 'P813'
 
-# Username: JimmyYourHonor, Password: 1139110841Fu
-login_instance = wdi_login.WDLogin(user='JimmyYourHonor', pwd='1139110841Fu')
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+
+# Setup login for wikidata
+login_instance = wdi_login.WDLogin(user=config['WIKI_DATA_USERNAME'], pwd=config['WIKI_DATA_PASSWORD'])
 for QID, gard_id in Qid_and_gardId_pairs.items():
     # Create the WDString data here: data type object
     gard_ref = wdi_core.WDItemID(value=gard_ref_val, prop_nr=stated_in, is_reference=True)

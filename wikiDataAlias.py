@@ -1,9 +1,13 @@
 from wikidataintegrator import wdi_core
 import requests
 import csv
+import yaml
 url = 'https://api.rarediseases.info.nih.gov/api/diseases'
 
-data = requests.get(url, headers={'APIKey': '^EaR5sBRm)Qa8)6lJgT8'}).json()
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+
+data = requests.get(url, headers={'APIKey': config['API_KEY']}).json()
 # First get data about rare diseases from the API.
 
 with open('diseaseOrganize.csv', 'w') as csv_file:
