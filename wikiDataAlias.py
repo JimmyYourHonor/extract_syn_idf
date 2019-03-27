@@ -67,6 +67,7 @@ with open('diseaseOrganize.csv', 'w') as csv_file:
                 match = 'True'
             else:
                 match = 'False'
+                # Here is where we add the gard entry to wikidata
 
         num_of_matches = str(len(set_of_results))
         QIDs = ''
