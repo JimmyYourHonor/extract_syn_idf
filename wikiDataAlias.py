@@ -32,6 +32,7 @@ with open('diseaseOrganize.csv', 'w') as csv_file:
         for idf in identifiers:
             identifiers_str = identifiers_str + idf['identifierType'] + ':' + idf['identifierId'] + ' | '
             predicate = ''
+            # Match the identifier type to their property number
             if idf['identifierType'] == 'OMIM':
                 predicate = 'P492'
             elif idf['identifierType'] == 'ORPHANET':
@@ -53,12 +54,14 @@ with open('diseaseOrganize.csv', 'w') as csv_file:
             else:
                 print('New identifierType ' + idf['identifierType'])
                 exit(1)
+            # Create and send the query
             query = 'SELECT ?item WHERE{ ?item wdt:' + predicate + ' \"' + idf['identifierId'] + '\";'+'p:'+predicate+' ?a. optional{?a pq:P4390 ?q}. filter(!bound(?q) || ?q = wd:Q39893449)}'
             result = wdi_core.WDItemEngine.execute_sparql_query(query)
             for uri in result['results']['bindings']:
                 set_of_results.add(uri['item']['value'])
 
         match = ''
+        # If only one wikidata item match found, request for gard id and check with gard id from gard
         if len(set_of_results) == 1:
             QID = set_of_results.pop()
             set_of_results.add(QID)
@@ -71,13 +74,13 @@ with open('diseaseOrganize.csv', 'w') as csv_file:
                 match = 'True'
             else:
                 match = 'False'
-                # Here is where we add the gard entry to wikidata
 
+        # Fill the csv file
         num_of_matches = str(len(set_of_results))
         QIDs = ''
         while len(set_of_results) != 0:
             q_number = set_of_results.pop()[31:]
             QIDs = QIDs + str(q_number) + ' | '
-        identifiers_str = identifiers_str[:len(identifiers_str)-1]
+        identifiers_str = identifiers_str[:len(identifiers_str)-3]
         writer.writerow({'Gard ID': gardId, 'identifiers': identifiers_str, 'Number of Matches': num_of_matches,
                          'QID': QIDs, 'Match Gard ID': match})

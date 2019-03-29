@@ -10,10 +10,11 @@ Qid_and_gardId_pairs = {
     'Q21154064': '13297',
     'Q21154079': '13296'
 }
+# gard property number
 prop_nr = 'P4317'
+# gard wiki item id
 gard_ref_val = 'Q47517289'
 stated_in = 'P248'
-
 retrieved = 'P813'
 
 with open('config.yaml', 'r') as file:
@@ -22,13 +23,16 @@ with open('config.yaml', 'r') as file:
 # Setup login for wikidata
 login_instance = wdi_login.WDLogin(user=config['WIKI_DATA_USERNAME'], pwd=config['WIKI_DATA_PASSWORD'])
 for QID, gard_id in Qid_and_gardId_pairs.items():
-    # Create the WDString data here: data type object
+    # Create the reference objects
     gard_ref = wdi_core.WDItemID(value=gard_ref_val, prop_nr=stated_in, is_reference=True)
     date_ref = wdi_core.WDTime(time=strftime("+%Y-%m-%dT00:00:00Z", gmtime()), prop_nr=retrieved, is_reference=True)
 
+    # add reference to list of references
     references = [[gard_ref, date_ref]]
+    # Create the gard id entry
     entry_gard_id = wdi_core.WDString(value=gard_id, prop_nr=prop_nr, references=references)
 
     data = [entry_gard_id]
+    # Create the item and write to wikidata
     wd_item = wdi_core.WDItemEngine(wd_item_id=QID, data=data)
     wd_item.write(login_instance)
